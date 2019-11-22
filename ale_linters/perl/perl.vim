@@ -13,6 +13,10 @@ let s:begin_failed_skip_pattern = '\v' . join([
 \   '^Can''t locate',
 \], '|')
 
+let s:skip_pattern = '\v' . join([
+\   '^Subroutine \w+ redefined',
+\], '|')
+
 function! ale_linters#perl#perl#Handle(buffer, lines) abort
     if empty(a:lines)
         return []
@@ -41,6 +45,8 @@ function! ale_linters#perl#perl#Handle(buffer, lines) abort
         \   l:text isnot# 'BEGIN failed--compilation aborted'
         \   || empty(l:output)
         \   || match(l:output[-1].text, s:begin_failed_skip_pattern) < 0
+        \ ) && (
+        \   match(l:text, s:skip_pattern) < 0
         \ )
             call add(l:output, {
             \   'lnum': l:line,
